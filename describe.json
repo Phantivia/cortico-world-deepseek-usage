@@ -1,0 +1,151 @@
+{
+  "tools": [
+    {
+      "name": "deepseek_usage_check",
+      "description": "Balance of the registered DeepSeek accounts, read from DeepSeek (a reading younger than the cache time is reused; the result gives its time). Omit account to read all.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "type": "string",
+            "description": "Account id or label."
+          }
+        }
+      },
+      "tags": [
+        "read"
+      ],
+      "summary": {
+        "zh": "查登记的 DeepSeek 账户余额,带查询时刻。",
+        "en": "Reads the balance of the registered DeepSeek accounts, with the time read."
+      }
+    },
+    {
+      "name": "deepseek_usage_add_account",
+      "description": "Register a DeepSeek account with its API key. The key is read once first and the account is saved only if that works. The key is stored in the deployment .env and never shown again.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "Name for the account. Default \"DeepSeek\"."
+          },
+          "warn_below": {
+            "type": "number",
+            "description": "Warning line in the account's currency; an event arrives when the balance drops below it."
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "tags": [
+        "write"
+      ],
+      "summary": {
+        "zh": "用一把 API key 登记账户;先查一次,查通才保存。",
+        "en": "Registers an account with an API key; saved only if a first read works."
+      }
+    },
+    {
+      "name": "deepseek_usage_edit_account",
+      "description": "Rename an account, set or clear its warning line, or remove it together with its stored key.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "type": "string",
+            "description": "Account id or label."
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "warn_below": {
+            "type": "number",
+            "description": "New warning line in the account's currency."
+          },
+          "clear_warning": {
+            "type": "boolean"
+          },
+          "remove": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "account"
+        ]
+      },
+      "tags": [
+        "write"
+      ],
+      "summary": {
+        "zh": "改账户备注、设或去掉警告线、删除账户。",
+        "en": "Renames an account, sets or clears its warning line, or removes it."
+      }
+    },
+    {
+      "name": "deepseek_usage_set_schedule",
+      "description": "Set when a report of all accounts arrives as an event, and whether it wakes you. An empty times list turns the report off.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "times": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "string",
+              "pattern": "^\\d{1,2}:\\d{2}$"
+            },
+            "description": "Local times, HH:MM."
+          },
+          "wake": {
+            "type": "boolean",
+            "description": "true wakes you at each report; false delivers it with the next batch of events."
+          }
+        }
+      },
+      "tags": [
+        "write"
+      ],
+      "summary": {
+        "zh": "设定时播报的时刻与是否叫醒 bot。",
+        "en": "Sets the scheduled report times and whether they wake the bot."
+      }
+    }
+  ],
+  "events": [
+    {
+      "type": "deepseek-usage.report",
+      "description": {
+        "zh": "定时播报:全部账户此刻的余额;按设置叫醒 bot 或随下一批事件送达。",
+        "en": "Scheduled report of every account's balance; wakes the bot or rides with the next batch, as set."
+      },
+      "trigger": "flush"
+    },
+    {
+      "type": "deepseek-usage.low",
+      "description": {
+        "zh": "某个账户的余额从警告线上方跌到下方;按设置叫醒 bot 或随下一批事件送达。",
+        "en": "An account's balance dropped below its warning line; wakes the bot or rides with the next batch, as set."
+      },
+      "trigger": "flush"
+    }
+  ],
+  "prompts": [
+    {
+      "key": "worlds.deepseek-usage.envPrompt",
+      "title": "DeepSeek 余额 · 环境提示词",
+      "role": "envPrompt",
+      "content": "## DeepSeek 账户余额\n\n你能查操作员登记的 DeepSeek 账户余额:{{deepseek-usage.accounts}}。读数是向 DeepSeek 查询那一刻的值，回执写着查询时刻和币种，不要换算或推测。\n\n你也能替操作员登记账户(需要对方给出 API key)、改备注、设警告线、删账户、改定时播报。key 只会存进部署配置，之后不再显示;对方在多人场合贴出 key 时，提醒对方去 DeepSeek 开放平台作废它。\n\n### 收到的事件\n\n- `deepseek-usage.report`:定时播报，全部账户此刻的余额。播报时刻:{{deepseek-usage.schedule}}。\n- `deepseek-usage.low`:某个账户跌破了警告线。警告线:{{deepseek-usage.alerts}}。\n"
+    }
+  ]
+}

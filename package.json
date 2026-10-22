@@ -1,0 +1,74 @@
+{
+  "name": "cortico-world-deepseek-usage",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Cortico World: the bot reads DeepSeek account balances, with scheduled reports and low-balance alerts",
+  "license": "MIT",
+  "keywords": [
+    "cortico-world",
+    "cortico",
+    "deepseek",
+    "balance",
+    "usage"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.5.0",
+  "main": "./src/index.ts",
+  "cortico": {
+    "kind": "world",
+    "api": 6,
+    "displayName": "DeepSeek Usage",
+    "icon": "assets/icon.png",
+    "locales": {
+      "zh": {
+        "displayName": "DeepSeek 余额",
+        "description": "bot 查询 DeepSeek 账户余额，可定时播报、跌破警告线时提醒"
+      },
+      "en": {
+        "displayName": "DeepSeek Usage",
+        "description": "The bot reads DeepSeek account balances, with scheduled reports and low-balance alerts"
+      }
+    },
+    "tags": [
+      "diagnostics",
+      "experimental"
+    ],
+    "describe": "describe.json",
+    "webUiClient": "dist/webui.js",
+    "webUiStyle": "dist/webui.css"
+  },
+  "files": [
+    "src",
+    "dist",
+    "assets",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "describe.json"
+  ],
+  "scripts": {
+    "build": "node scripts/build-webui.mjs",
+    "prepack": "node scripts/build-webui.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.web.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "cortico": "^0.2.5",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "author": "Phantivia",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Phantivia/cortico-world-deepseek-usage.git"
+  },
+  "homepage": "https://github.com/Phantivia/cortico-world-deepseek-usage#readme",
+  "bugs": {
+    "url": "https://github.com/Phantivia/cortico-world-deepseek-usage/issues"
+  }
+}
